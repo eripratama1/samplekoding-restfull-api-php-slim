@@ -77,7 +77,7 @@ class ProductController
          * membuat representasi JSON dari data dan
          * informasi paging dan mentapkan formatnya dalam bentuk
          * JSON 
-         */ 
+         */
         $response->getBody()->write(json_encode([
             'data' => $products,
             'total' => $total,
@@ -142,5 +142,32 @@ class ProductController
             $response->getBody()->write(json_encode(['error' => 'Error stored product : ' . $e->getMessage()]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
+    }
+
+    public function show(Request $request, Response $response, $args)
+    {
+        /** Mendapatkan ID produk dari argumen yang dikirimkan oleh user */
+        $productId = $args['id'];
+
+        /** Menyiapkan query untuk mendapatkan data yang sesuai dengan id produk yang dikirimkan */
+        $query = "SELECT * FROM  products WHERE id = :id";
+        $stmt = $this->database->prepare($query);
+        $stmt->bindParam(":id", $productId, PDO::PARAM_INT);
+
+        /** Mengeksekusi query */
+        $stmt->execute();
+        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        /** 
+         * Jika data produk tidak ditemukan kembalikan response error
+         * Jika data produk ditemukan kembalikan response beserta datanya
+         */
+        if (!$product) {
+            $response->getBody()->write(json_encode(['error' => 'Product not found']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+        }
+
+        $response->getBody()->write(json_encode(['data' => $product]));
+        return $response->withHeader('Content-Type', 'application/json');
     }
 }

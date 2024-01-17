@@ -32,6 +32,14 @@
             $group->get('',[$productController,'index']);
 
             /**
+             * Mendefinisikan rute GET untuk menampilkan data produk berdasarkan id produk.
+               URL    : /api/v1/products/idProduk
+               Metode : GET
+               Aksi   : Memanggil fungsi show() di ProductController.
+             */
+            $group->get('/{id}',[$productController,'show']);
+
+            /**
               Mendefinisikan rute POST untuk menyimpan produk baru.
               URL     : /api/v1/products/store
              Metode   : POST
