@@ -46,6 +46,15 @@
              Aksi     : Memanggil fungsi store() di ProductController.
              */
             $group->post('/store',[$productController,'store']);
+
+             /**
+              Mendefinisikan dua rute PUT dan PATCH untuk update produk baru.
+              URL     : /api/v1/products/update/{id}
+             Metode   : PUT or PATCH
+             Aksi     : Memanggil fungsi update() di ProductController.
+             */
+            $group->put('/update/{id}',[$productController,'update']);
+            $group->patch('/update/{id}',[$productController,'update']);
         });
     }
  }

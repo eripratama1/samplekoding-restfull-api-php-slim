@@ -170,4 +170,47 @@ class ProductController
         $response->getBody()->write(json_encode(['data' => $product]));
         return $response->withHeader('Content-Type', 'application/json');
     }
+
+    public  function update(Request $request, Response $response, $args)
+    {
+        /** Mendapatkan ID produk dari argumen yang dikirimkan oleh user */
+        $id = $args['id'];
+
+        /** Cek content-type yang dikirimkan */
+        $contentType = $request->getHeaderLine('Content-Type');
+        if (strpos($contentType, 'application/json') === false) {
+
+            /** Jika Content-Type bukan JSON, kembalikan error berikut */
+            $response->getBody()->write(json_encode(['error' => 'Invalid content type, expected application/json']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+
+        $data = json_decode($request->getBody(), true);
+
+          /** Validasi kelengkapan data */
+        if (empty($data['name']) || empty($data['description']) || empty($data['price'])) {
+
+            /** Jika data tidak lengkap, kembalikan error */
+            $response->getBody()->write(json_encode(['error' => 'Incomplete data ']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(302);
+        }
+
+        /** Menyiapkan query untuk proses update data */
+        $query = "UPDATE products SET name = :name, description = :description, price = :price WHERE id = :id";
+        $stmt = $this->database->prepare($query);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':name', $data['name'], PDO::PARAM_STR);
+        $stmt->bindParam('description', $data['description'], PDO::PARAM_STR);
+        $stmt->bindParam(':price', $data['price'], PDO::PARAM_INT);
+
+        try {
+            $stmt->execute();
+            $response->getBody()->write(json_encode(['message' => 'Update data complete ']));
+            return $response->withHeader('Content-Type', 'application/json');
+        } catch (PDOException $e) {
+            $response->getBody()->write(json_encode(['error' => 'Error updating data ' . $e->getMessage()]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    }
 }
