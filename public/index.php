@@ -17,7 +17,7 @@ $app = AppFactory::create();
 $database = new PDO('mysql:host=localhost;dbname=restapi-php','samplekoding','Password123@');
 
 /** Menambahkan middleware error untuk menangani kesalahan yang terjadi selama proses request */
-$app->addErrorMiddleware(false,true,false);
+$app->addErrorMiddleware(true,true,false);
 
 /** Membuat instance ProductController untuk menangani logika bisnis terkait produk */
 $productController = new ProductController($app,$database);

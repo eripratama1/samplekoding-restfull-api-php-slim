@@ -213,4 +213,40 @@ class ProductController
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
     }
+
+    public function destroy(Request $request,Response $response,$args)
+    {
+        /** 
+         * Mendapatkan id produk dari argumen yang dikirimkan saat endpoint
+         * di akses oleh user
+         */
+        $id = $args['id'];
+
+        /** 
+         * Menyiapkan query SQL untuk menghapus produk
+         * Menyiapkan object yang berisi query untuk di eksekusi,
+         * menambahkan bindParam id untuk mencegah SQL injection
+         */
+        $query = "DELETE FROM products WHERE id = :id";
+        $stmt = $this->database->prepare($query);
+        $stmt->bindParam(':id',$id,PDO::PARAM_INT);
+
+        try {
+            /** Menjalankan query untuk hapus data produk */
+            $stmt->execute();
+            /**
+             * Jika proses hapus data berhasil
+             * Tampilkan response dan pesan dalam format JSON
+             */
+            $response->getBody()->write(json_encode(['message' => "Data deleted"]));
+            return $response->withHeader('Content-Type','application/json');
+        } catch (PDOException $e) {
+            /**
+             * Jika proses hapus data gagal
+             * Tampilkan response dan pesan error dalam format JSON
+             */
+            $response->getBody()->write(json_encode(['error' => "Error Delete data".$e->getMessage()]));
+            return $response->withHeader('Content-Type','application/json')->withStatus(500);
+        }
+    }
 }
