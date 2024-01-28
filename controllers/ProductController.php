@@ -249,4 +249,19 @@ class ProductController
             return $response->withHeader('Content-Type','application/json')->withStatus(500);
         }
     }
+
+    public function search(Request $request,Response $response)
+    {
+        /** Mengambil keyword pencarian dari parameter kueri 'search', default ke string kosong jika tidak ada */
+        $search = $request->getQueryParams()['search'] ?? '';
+
+        /** Memanggil fungsi 'searchProducts' untuk melakukan pencarian di database */
+        $searchResult = searchProducts($this->database,$search);
+
+        /** Menulis hasil pencarian yang dienkode dalam format JSON ke dalam response body */
+        $response->getBody()->write(json_encode($searchResult));
+
+        /** Mengatur header Content-Type ke 'application/json' untuk menunjukkan respons JSON */
+        return $response->withHeader('Content-Type','application/json')->withStatus(500);
+    }
 }
